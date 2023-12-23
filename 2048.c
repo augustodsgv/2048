@@ -35,19 +35,19 @@ int generate_cicle(field * campo){
 int get_input(field * campo){
     char input[10];
     scanf("%s", &input);
-    if(!strcmp("up", input) || !strcmp("u", input)){
+    if(!strcmp("up", input) || !strcmp("u", input) || !strcmp("W", input) || !strcmp("cima", input)){
         bottom_up(campo);
         return 1;
     }
-    if(!strcmp("down", input) || !strcmp("d", input)){
+    if(!strcmp("down", input) || !strcmp("d", input) || !strcmp("S", input) || !strcmp("baixo", input)){
         up_down(campo);
         return 1;
     }
-    if(!strcmp("right", input) || !strcmp("r", input)){
+    if(!strcmp("right", input) || !strcmp("r", input) || !strcmp("D", input) || !strcmp("direita", input)){
         left_right(campo);
         return 1;
     }
-    if(!strcmp("left", input) || !strcmp("l", input)){
+    if(!strcmp("left", input) || !strcmp("l", input) || !strcmp("A", input) || !strcmp("esquerda", input)){
         right_left(campo);
         return 1;
     }
