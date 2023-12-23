@@ -7,7 +7,8 @@ typedef struct field{
     int nNumbers;
     int highestN;
 }field;
-
+field * build_field(int field_size);
+int generate_cicle(field * campo);
 int get_input(field * campo);
 void left_right(field * campo);
 void right_left(field * campo);

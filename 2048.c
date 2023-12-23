@@ -2,8 +2,35 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <time.h>
 #include "2048.h"
 #include "table_library/table.h"
+
+field * build_field(int field_size){
+    field * new_field = malloc(sizeof(field));
+    new_field->fieldSize = field_size;
+    new_field->matriz = malloc(sizeof(int**) * field_size);
+    for(int i = 0; i < field_size; i++) new_field->matriz[i] = malloc(sizeof(int) * field_size);
+    for(int i = 0; i < field_size; i++)
+        for(int j = 0; j < field_size; j++)
+            new_field->matriz[i][j] = -1;
+    srand(time(NULL));
+    generate_cicle(new_field);
+    return new_field;
+}
+
+int generate_cicle(field * campo){
+    int random;
+    if(campo->nNumbers >= pow(campo->fieldSize, 2)) return 0;       // O campo está cheio
+
+    random = rand() % (int)(pow(campo->fieldSize, 2));  // size² is so  0 < (random / f_size) < f_size and 0 < (random % f_size) < f_size
+    do{
+        if(campo->matriz[(int)random / campo->fieldSize][random % campo->fieldSize] == -1)
+            campo->matriz[(int)random / campo->fieldSize][random % campo->fieldSize] = 2;
+            return 1;
+        random++;
+    }while(1);
+}
 
 int get_input(field * campo){
     char input[10];
@@ -40,7 +67,7 @@ void left_right(field * campo){
                         campo->matriz[i][j] += campo->matriz[i][k];   // We could just 2x that, but what if we want something else later...
                         campo->matriz[i][k] = -1;
                     break;                      // It might seem horrible but otherwise we would need to make that "for" ugly   
-                    }
+                    }else if(campo->matriz[i][k] != -1) break;
                 }
         }
         // Shifting left
@@ -70,7 +97,8 @@ void right_left(field * campo){
                         campo->matriz[i][j] += campo->matriz[i][k];   // We could just 2x that, but what if we want something else later...
                         campo->matriz[i][k] = -1;
                     break;                      // It might seem horrible but otherwise we would need to make that "for" ugly   
-                    }
+                    }else if(campo->matriz[i][k] != -1) break;
+                    
                 }
         }
         // Shifting left
@@ -81,7 +109,8 @@ void right_left(field * campo){
                         campo->matriz[i][j] = campo->matriz[i][k];
                         campo->matriz[i][k] = -1;
                         break;                  // Again, give it a change, it would be a ugly for  
-                    }
+                    }else if(campo->matriz[i][k] != -1) break;
+                    
                 }
             }
         }
@@ -100,7 +129,8 @@ void up_down(field * campo){
                         campo->matriz[j][i] += campo->matriz[k][i];   // We could just 2x that, but what if we want something else later...
                         campo->matriz[k][i] = -1;
                     break;                      // It might seem horrible but otherwise we would need to make that "for" ugly   
-                    }
+                    }else if(campo->matriz[k][i] != -1) break;
+                    
                 }
         }
 
@@ -113,6 +143,7 @@ void up_down(field * campo){
                         campo->matriz[k][i] = -1;
                         break;                  // Again, give it a change, it would be a ugly for  
                     }
+                    
                 }
             }
         }
@@ -131,7 +162,8 @@ void bottom_up(field * campo){
                         campo->matriz[j][i] += campo->matriz[k][i];   // We could just 2x that, but what if we want something else later...
                         campo->matriz[k][i] = -1;
                     break;                      // It might seem horrible but otherwise we would need to make that "for" ugly   
-                    }
+                    }else if(campo->matriz[k][i] != -1) break;
+                    
                 }
         }
         // Shifting left
