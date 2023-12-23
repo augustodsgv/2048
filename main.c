@@ -30,25 +30,10 @@ int main(){
     matrix[3][2] = 2;
     matrix[3][3] = 2;
 
-    print_matrix((void***)&matrix, campo.fieldSize, campo.fieldSize, "%d");
-
-    print_field(&campo);
-
-    up_down(&campo);
-
-    print_field(&campo);
-
-    bottom_up(&campo);
-
-    print_field(&campo);
-
-    right_left(&campo);
-
-    print_field(&campo);
-
-    left_right(&campo);
-
-    print_field(&campo);
+    while(1){
+        print_field(&campo);
+        get_input(&campo);
+    }
 
 
     return 0;

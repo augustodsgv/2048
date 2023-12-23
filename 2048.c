@@ -5,6 +5,29 @@
 #include "2048.h"
 #include "table_library/table.h"
 
+int get_input(field * campo){
+    char input[10];
+    scanf("%s", &input);
+    if(!strcmp("up", input) || !strcmp("u", input)){
+        bottom_up(campo);
+        return 1;
+    }
+    if(!strcmp("down", input) || !strcmp("d", input)){
+        up_down(campo);
+        return 1;
+    }
+    if(!strcmp("right", input) || !strcmp("r", input)){
+        left_right(campo);
+        return 1;
+    }
+    if(!strcmp("left", input) || !strcmp("l", input)){
+        right_left(campo);
+        return 1;
+    }
+    printf("Comando inválido! Tente novamente!\n");
+    return 0;
+}
+
 void left_right(field * campo){
     // TODO : investigate use of parallelism here
     // Here, we are adopting a two step approach : first, we add the equals, later, we shift them right
@@ -71,7 +94,7 @@ void up_down(field * campo){
     for(int i = 0; i < campo->fieldSize; i++){
         // Adding the equals
         for(int j = campo->fieldSize - 1; j >= 1; j--){
-            if(campo->matriz[i][j] != -1)
+            if(campo->matriz[j][i] != -1)
                 for(int k = j - 1; k >= 0; k--){
                     if(campo->matriz[k][i] == campo->matriz[j][i]){
                         campo->matriz[j][i] += campo->matriz[k][i];   // We could just 2x that, but what if we want something else later...
@@ -136,10 +159,10 @@ void print_field(field * campo){
     print_table((void***)converted_matrix, campo->fieldSize, campo->fieldSize, NULL, &print_configs);
 
 }
+
 // Função que converte a matriz para string para que as demais funções funcionem adequadamente
 // Adaptação da função da biblioteca
 char *** convert_matrix_2048(int ** matrix, int n_lines, int n_columns){
-    print_matrix((void***)&matrix, n_lines, n_columns, "%d");
     // Alocando a matrix de strings. É necessário um vetor de 3 dimensões pois a string é um vetor unidimensional
     char *** char_matrix = malloc(sizeof(char**) * n_lines);
     for (int i = 0; i < n_lines; i++){

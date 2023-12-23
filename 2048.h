@@ -8,6 +8,7 @@ typedef struct field{
     int highestN;
 }field;
 
+int get_input(field * campo);
 void left_right(field * campo);
 void right_left(field * campo);
 void up_down(field * campo);
