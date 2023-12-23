@@ -40,7 +40,7 @@ int get_input(field * campo){
         return 1;
     }
     if(!strcmp("down", input) || !strcmp("d", input) || !strcmp("S", input) || !strcmp("baixo", input)){
-        up_down(campo);
+        top_down(campo);
         return 1;
     }
     if(!strcmp("right", input) || !strcmp("r", input) || !strcmp("D", input) || !strcmp("direita", input)){
@@ -117,7 +117,7 @@ void right_left(field * campo){
     }
 }
 
-void up_down(field * campo){
+void top_down(field * campo){
     // TODO : investigate use of parallelism here
     // Here, we are adopting a two step approach : first, we add the equals, later, we shift them right
     for(int i = 0; i < campo->fieldSize; i++){
