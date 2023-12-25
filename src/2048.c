@@ -6,16 +6,20 @@
 #include "2048.h"
 #include "table_library/table.h"
 
-field * build_field(int field_size){
+field * build_field(int fieldSize){
     field * new_field = malloc(sizeof(field));
-    new_field->fieldSize = field_size;
-    new_field->matriz = malloc(sizeof(int**) * field_size);
-    for(int i = 0; i < field_size; i++) new_field->matriz[i] = malloc(sizeof(int) * field_size);
-    for(int i = 0; i < field_size; i++)
-        for(int j = 0; j < field_size; j++)
+    new_field->fieldSize = fieldSize;
+    new_field->matriz = malloc(sizeof(int**) * fieldSize);
+    for(int i = 0; i < fieldSize; i++) new_field->matriz[i] = malloc(sizeof(int) * fieldSize);
+    for(int i = 0; i < fieldSize; i++)
+        for(int j = 0; j < fieldSize; j++)
             new_field->matriz[i][j] = -1;
     srand(time(NULL));
     generate_cicle(new_field);
+    generate_cicle(new_field);
+    new_field->highestNum = 2;      // The first value starts with 2
+    new_field->nMoves = 0;
+    new_field->score = 0;           // The score will be calculated by each time you can combine two cells
     return new_field;
 }
 
@@ -25,9 +29,10 @@ int generate_cicle(field * campo){
 
     random = rand() % (int)(pow(campo->fieldSize, 2));  // size² is so  0 < (random / f_size) < f_size and 0 < (random % f_size) < f_size
     do{
-        if(campo->matriz[(int)random / campo->fieldSize][random % campo->fieldSize] == -1)
+        if(campo->matriz[(int)random / campo->fieldSize][random % campo->fieldSize] == -1){
             campo->matriz[(int)random / campo->fieldSize][random % campo->fieldSize] = 2;
             return 1;
+        }
         random++;
     }while(1);
 }
@@ -37,18 +42,22 @@ int get_input(field * campo){
     scanf("%s", &input);
     if(!strcmp("up", input) || !strcmp("u", input) || !strcmp("W", input) || !strcmp("cima", input)){
         bottom_up(campo);
+        campo->nMoves++;
         return 1;
     }
     if(!strcmp("down", input) || !strcmp("d", input) || !strcmp("S", input) || !strcmp("baixo", input)){
         top_down(campo);
+        campo->nMoves++;
         return 1;
     }
     if(!strcmp("right", input) || !strcmp("r", input) || !strcmp("D", input) || !strcmp("direita", input)){
         left_right(campo);
+        campo->nMoves++;
         return 1;
     }
     if(!strcmp("left", input) || !strcmp("l", input) || !strcmp("A", input) || !strcmp("esquerda", input)){
         right_left(campo);
+        campo->nMoves++;
         return 1;
     }
     printf("Comando inválido! Tente novamente!\n");
@@ -66,6 +75,7 @@ void left_right(field * campo){
                     if(campo->matriz[i][k] == campo->matriz[i][j]){
                         campo->matriz[i][j] += campo->matriz[i][k];   // We could just 2x that, but what if we want something else later...
                         campo->matriz[i][k] = -1;
+                        campo->score += campo->matriz[i][j];        // Increasing score
                     break;                      // It might seem horrible but otherwise we would need to make that "for" ugly   
                     }else if(campo->matriz[i][k] != -1) break;
                 }
@@ -96,6 +106,7 @@ void right_left(field * campo){
                     if(campo->matriz[i][k] == campo->matriz[i][j]){
                         campo->matriz[i][j] += campo->matriz[i][k];   // We could just 2x that, but what if we want something else later...
                         campo->matriz[i][k] = -1;
+                        campo->score += campo->matriz[i][j];        // Increasing score
                     break;                      // It might seem horrible but otherwise we would need to make that "for" ugly   
                     }else if(campo->matriz[i][k] != -1) break;
                     
@@ -128,7 +139,8 @@ void top_down(field * campo){
                     if(campo->matriz[k][i] == campo->matriz[j][i]){
                         campo->matriz[j][i] += campo->matriz[k][i];   // We could just 2x that, but what if we want something else later...
                         campo->matriz[k][i] = -1;
-                    break;                      // It might seem horrible but otherwise we would need to make that "for" ugly   
+                        campo->score += campo->matriz[j][i];        // Increasing score
+                        break;                      // It might seem horrible but otherwise we would need to make that "for" ugly   
                     }else if(campo->matriz[k][i] != -1) break;
                     
                 }
@@ -161,6 +173,7 @@ void bottom_up(field * campo){
                     if(campo->matriz[k][i] == campo->matriz[j][i]){
                         campo->matriz[j][i] += campo->matriz[k][i];   // We could just 2x that, but what if we want something else later...
                         campo->matriz[k][i] = -1;
+                        campo->score += campo->matriz[j][i];        // Increasing score
                     break;                      // It might seem horrible but otherwise we would need to make that "for" ugly   
                     }else if(campo->matriz[k][i] != -1) break;
                     
@@ -179,6 +192,23 @@ void bottom_up(field * campo){
             }
         }
     }
+}
+
+void calc_game_params(field * campo){
+    int newFieldSize = 0;
+    for(int i = 0; i < campo->fieldSize; i++)
+        for(int j = 0; j < campo->fieldSize; j++){
+            int currentCell = campo->matriz[i][j];
+            if(currentCell != -1){
+                newFieldSize++;
+                if(currentCell > campo->highestNum) campo->highestNum = currentCell;
+            }
+        }
+}
+
+void print_game_params(field * campo){
+    printf("Score: %d\n", campo->score);
+    printf("Moves: %d\n", campo->nMoves);
 }
 
 void print_field(field * campo){

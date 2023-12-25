@@ -1,8 +1,14 @@
 #include "2048.h"
+#include <stdlib.h>
 
-int main(){
-    field * campo = build_field(4);
+int main(int argc, const char * argv[]){
+    int fieldSize = 4;
+    if(argc > 1) fieldSize = (int)strtol(argv[1], NULL, 10);
+    field * campo = build_field(fieldSize);
     while(1){
+        system("clear");
+        calc_game_params(campo);
+        print_game_params(campo);
         print_field(campo);
         get_input(campo);
         generate_cicle(campo);

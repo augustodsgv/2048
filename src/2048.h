@@ -5,8 +5,13 @@ typedef struct field{
     int ** matriz;
     int fieldSize;
     int nNumbers;
-    int highestN;
+    int highestNum;
+    int score;
+    int nMoves;
 }field;
+
+void calc_game_params(field * campo);
+void print_game_params(field * campo);
 field * build_field(int field_size);
 int generate_cicle(field * campo);
 int get_input(field * campo);
