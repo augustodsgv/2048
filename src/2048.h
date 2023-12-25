@@ -10,6 +10,12 @@ typedef struct field{
     int nMoves;
 }field;
 
+void save_input(field * campo);
+void save_game(field * campo, char * file_name);
+
+void load_input(field * campo);
+field * load_save(char * file_name);
+
 void calc_game_params(field * campo);
 void print_game_params(field * campo);
 field * build_field(int field_size);

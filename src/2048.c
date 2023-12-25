@@ -6,6 +6,98 @@
 #include "2048.h"
 #include "table_library/table.h"
 
+void save_input(field * campo){
+    char * file_name = malloc(sizeof(char) * 10);
+    int save_slot;
+    printf("Choose a save slot (from 1 to 10): ");
+    scanf("%d", &save_slot);
+    sprintf(file_name, "saves/save%d.txt", save_slot);
+    save_game(campo, file_name);
+    printf("Game successfully saved at slot %d!\n", save_slot);
+}
+
+void save_game(field * campo, char * file_name){
+    FILE * arquivo = fopen(file_name, "w");
+    // Saving game parameters
+    fprintf(arquivo, "%d\n", campo->fieldSize);
+    fprintf(arquivo, "%d\n", campo->highestNum);
+    fprintf(arquivo, "%d\n", campo->nMoves);
+    fprintf(arquivo, "%d\n", campo->nNumbers);
+    fprintf(arquivo, "%d\n", campo->score);
+
+    // Saving the field matrix
+    for(int i = 0; i < campo->fieldSize; i++){
+        for(int j = 0; j < campo->fieldSize; j++){
+            fprintf(arquivo, "%d ", campo->matriz[i][j]);
+        }
+        fprintf(arquivo, "\n");
+    }
+    fclose(arquivo);
+}
+
+void load_input(field * campo){
+    char * file_name = malloc(sizeof(char) * 10);
+    int save_slot;
+    char save_game = ' ';
+    printf("Choose a save slot to load a game (1 to 10): ");
+    scanf("%d", &save_slot);
+    sprintf(file_name, "save%d.txt", save_slot);
+    printf("Would you like to save this current game? [y | n]: ");
+    scanf("%c", &save_game);
+    while(save_game != 'y' && save_game != 'n'){
+        printf("Invalid input \"%c\", type a valid input\n", save_game);
+        printf("Would you like to save this current game? [y | n]: ");
+        scanf("%c", &save_game);
+    }
+    if(save_game == 'y'){
+        save_input(campo);
+    }
+    free(campo);
+    campo = load_save(file_name);
+}
+
+field * load_save(char * file_name){
+    FILE * arquivo = fopen(file_name, "r");
+    // Loading game parameters
+    int fieldSize = read_integer_file(arquivo);
+    field * campo = build_field(fieldSize);
+    campo->highestNum = read_integer_file(arquivo);
+    campo->nMoves = read_integer_file(arquivo);
+    campo->nNumbers = read_integer_file(arquivo);
+    campo->score = read_integer_file(arquivo);
+    
+    // Loading the game matrix
+    for(int i = 0; i < campo->fieldSize; i++)
+        for(int j = 0; j < campo->fieldSize; j++){
+            campo->matriz[i][j] = read_integer_file(arquivo);
+        }
+
+    fclose(arquivo);
+
+    return campo;
+}
+
+// Function that reads a number in file and transforms into integer
+int read_integer_file(FILE * arquivo){
+    int num;
+    int i = 0;
+    char * read_buffer = malloc(sizeof(char) * 20);
+    char read_char = ' ';
+    while(read_char == ' ' || read_char == '\n')    // Eliminating spacing characthers from first read
+        fread(&read_char, sizeof(char), 1, arquivo);   
+    
+    // Here, we should verify the character before adding it to the string
+    do{
+        printf("%c\n", read_char);
+        read_buffer[i++] = read_char;
+        fread(&read_char, sizeof(char), 1, arquivo);
+    }while(read_char != '\n' && read_char != ' ');
+
+    num = strtol(read_buffer, NULL, 10);
+    free(read_buffer);
+    return num;
+}
+
 field * build_field(int fieldSize){
     field * new_field = malloc(sizeof(field));
     new_field->fieldSize = fieldSize;
@@ -58,6 +150,14 @@ int get_input(field * campo){
     if(!strcmp("left", input) || !strcmp("l", input) || !strcmp("A", input) || !strcmp("esquerda", input)){
         right_left(campo);
         campo->nMoves++;
+        return 1;
+    }
+    if(!strcmp("/SAVE", input)){
+        save_input(campo);
+        return 1;
+    }
+    if(!strcmp("/LOAD", input)){
+        load_input(campo);
         return 1;
     }
     printf("Comando inválido! Tente novamente!\n");
@@ -213,6 +313,7 @@ void print_game_params(field * campo){
 
 void print_field(field * campo){
     char *** converted_matrix = convert_matrix_2048(campo->matriz, campo->fieldSize, campo->fieldSize);
+
     table_config print_configs;
     print_configs.data_type = "%s";
     print_configs.header = 0;
@@ -231,6 +332,7 @@ char *** convert_matrix_2048(int ** matrix, int n_lines, int n_columns){
         char_matrix[i] = malloc(sizeof(char*) * n_columns);
         for(int j = 0; j < n_columns; j++){
             char_matrix[i][j] = malloc(sizeof(char) * 5);
+            char_matrix[i][j][0] = '\0';
             if(matrix[i][j] != -1)
                 sprintf(char_matrix[i][j], "%d", matrix[i][j]);
             else
