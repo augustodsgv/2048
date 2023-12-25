@@ -6,6 +6,7 @@
 #include "2048.h"
 #include "table_library/table.h"
 
+// Wrapper function that recives the user input and call the save_game function
 void save_input(field * campo){
     char * file_name = malloc(sizeof(char) * 10);
     int save_slot;
@@ -15,7 +16,7 @@ void save_input(field * campo){
     save_game(campo, file_name);
     printf("Game successfully saved at slot %d!\n", save_slot);
 }
-
+// Saves the game parameters in a file called "saveX", where X is a save slot
 void save_game(field * campo, char * file_name){
     FILE * arquivo = fopen(file_name, "w");
     // Saving game parameters
@@ -35,6 +36,8 @@ void save_game(field * campo, char * file_name){
     fclose(arquivo);
 }
 
+// Wrapper function that recives the user input to load a saved game
+// TODO : add a controll to do not allow user to load non existing saved games
 void load_input(field * campo){
     char * file_name = malloc(sizeof(char) * 10);
     int save_slot;
@@ -56,6 +59,7 @@ void load_input(field * campo){
     campo = load_save(file_name);
 }
 
+// Loads a game from a "save.txt" file
 field * load_save(char * file_name){
     FILE * arquivo = fopen(file_name, "r");
     // Loading game parameters
@@ -98,6 +102,7 @@ int read_integer_file(FILE * arquivo){
     return num;
 }
 
+// Function that allocates and initializes a fiel with inital values
 field * build_field(int fieldSize){
     field * new_field = malloc(sizeof(field));
     new_field->fieldSize = fieldSize;
@@ -105,8 +110,8 @@ field * build_field(int fieldSize){
     for(int i = 0; i < fieldSize; i++) new_field->matriz[i] = malloc(sizeof(int) * fieldSize);
     for(int i = 0; i < fieldSize; i++)
         for(int j = 0; j < fieldSize; j++)
-            new_field->matriz[i][j] = -1;
-    srand(time(NULL));
+            new_field->matriz[i][j] = -1;       // -1 indicates a empty field
+    srand(time(NULL));              // Initializes the rand genetation
     generate_cicle(new_field);
     generate_cicle(new_field);
     new_field->highestNum = 2;      // The first value starts with 2
@@ -115,6 +120,8 @@ field * build_field(int fieldSize){
     return new_field;
 }
 
+// Generates a new number in a random (and empty) place of the field
+// TODO : the crash bug seems to be here, and about the random generation
 int generate_cicle(field * campo){
     int random;
     if(campo->nNumbers >= pow(campo->fieldSize, 2)) return 0;       // O campo está cheio
@@ -129,6 +136,7 @@ int generate_cicle(field * campo){
     }while(1);
 }
 
+// Recieves and treats the user input
 int get_input(field * campo){
     char input[10];
     scanf("%s", &input);
@@ -164,6 +172,7 @@ int get_input(field * campo){
     return 0;
 }
 
+// Moves the cells from left to right
 void left_right(field * campo){
     // TODO : investigate use of parallelism here
     // Here, we are adopting a two step approach : first, we add the equals, later, we shift them right
@@ -195,6 +204,7 @@ void left_right(field * campo){
     }
 }
 
+// Moves the cells from right to left
 void right_left(field * campo){
     // TODO : investigate use of parallelism here
     // Here, we are adopting a two step approach : first, we add the equals, later, we shift them right
@@ -228,6 +238,7 @@ void right_left(field * campo){
     }
 }
 
+// Moves the cells from top to down
 void top_down(field * campo){
     // TODO : investigate use of parallelism here
     // Here, we are adopting a two step approach : first, we add the equals, later, we shift them right
@@ -262,6 +273,7 @@ void top_down(field * campo){
     }
 }
 
+// Moves the cells from bottom to up
 void bottom_up(field * campo){
     // TODO : investigate use of parallelism here
     // Here, we are adopting a two step approach : first, we add the equals, later, we shift them right
@@ -294,6 +306,7 @@ void bottom_up(field * campo){
     }
 }
 
+// Calculates the game parameters according to current state of the field
 void calc_game_params(field * campo){
     int newFieldSize = 0;
     for(int i = 0; i < campo->fieldSize; i++)
@@ -306,11 +319,13 @@ void calc_game_params(field * campo){
         }
 }
 
+// Prints the game parameters
 void print_game_params(field * campo){
     printf("Score: %d\n", campo->score);
     printf("Moves: %d\n", campo->nMoves);
 }
 
+// Prints the field in a grid formatted way
 void print_field(field * campo){
     char *** converted_matrix = convert_matrix_2048(campo->matriz, campo->fieldSize, campo->fieldSize);
 
