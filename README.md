@@ -31,9 +31,10 @@ You have four moves:
 Note that the third input matches the ```W```, ```A```, ```S```, ```D``` input, but to avoid conflicts it’s upper case (just use the ```CapsLk``` and be happy)
 
 # TODOs
-1. Add different field grid sizes
+1. Add different field grid sizes - OK
 2. Add a more automatic control (without pressing "enter")
-3. Add a more natural print (without printing tons of grids in the screen)
+3. Add a more natural print (without printing tons of grids in the screen) - OK
+4. Add a save option to continue the game even if the game was closed
 
 # Author
 
