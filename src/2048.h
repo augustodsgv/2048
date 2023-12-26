@@ -9,6 +9,8 @@ typedef struct field{
     int score;
     int nMoves;
 }field;
+void end_game_input(field * campo);
+void end_game(field * campo);
 
 void save_input(field * campo);
 void save_game(field * campo, char * file_name);
@@ -17,6 +19,8 @@ void load_input(field * campo);
 field * load_save(char * file_name);
 
 void calc_game_params(field * campo);
+int is_board_full(field * campo);
+
 void print_game_params(field * campo);
 field * build_field(int field_size);
 int generate_cicle(field * campo);

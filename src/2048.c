@@ -6,6 +6,40 @@
 #include "2048.h"
 #include "table_library/table.h"
 
+void end_game_input(field * campo){
+    char user_input;
+    printf("Are you sure you want to leave the game? [y | n]");
+    scanf("%c", &user_input);
+    while(user_input != 'y' && user_input != 'n'){
+        printf("Invalid input \"%c\", type a valid input\n", user_input);
+        printf("Are you sure you want to leave the game? [y | n]");
+        scanf("%c", &user_input);
+    }
+    if(user_input == 'n') return;
+    printf("Would you like to save this current game? [y | n]: ");
+    scanf("%c", &user_input);
+    while(user_input != 'y' && user_input != 'n'){
+        printf("Invalid input \"%c\", type a valid input\n", user_input);
+        printf("Would you like to save this current game? [y | n]: ");
+        scanf("%c", &user_input);
+    }
+    if(user_input == 'y'){
+        save_input(campo);
+    }
+    end_game(campo);
+}
+
+void end_game(field * campo){
+    system("clear");
+    print_field(campo);
+    printf("End of the game!\n");
+    printf("Your results:\n");
+    printf("Score: %d\n", campo->score);
+    printf("Hightest number: %d\n", campo->highestNum);
+    printf("Moves: %d\n", campo->nMoves);
+    exit(0);
+}
+
 // Wrapper function that recives the user input and call the save_game function
 void save_input(field * campo){
     char * file_name = malloc(sizeof(char) * 10);
@@ -16,6 +50,7 @@ void save_input(field * campo){
     save_game(campo, file_name);
     printf("Game successfully saved at slot %d!\n", save_slot);
 }
+
 // Saves the game parameters in a file called "saveX", where X is a save slot
 void save_game(field * campo, char * file_name){
     FILE * arquivo = fopen(file_name, "w");
@@ -41,18 +76,18 @@ void save_game(field * campo, char * file_name){
 void load_input(field * campo){
     char * file_name = malloc(sizeof(char) * 10);
     int save_slot;
-    char save_game = ' ';
+    char user_input = ' ';
     printf("Choose a save slot to load a game (1 to 10): ");
     scanf("%d", &save_slot);
     sprintf(file_name, "save%d.txt", save_slot);
     printf("Would you like to save this current game? [y | n]: ");
-    scanf("%c", &save_game);
-    while(save_game != 'y' && save_game != 'n'){
-        printf("Invalid input \"%c\", type a valid input\n", save_game);
+    scanf("%c", &user_input);
+    while(user_input != 'y' && user_input != 'n'){
+        printf("Invalid input \"%c\", type a valid input\n", user_input);
         printf("Would you like to save this current game? [y | n]: ");
-        scanf("%c", &save_game);
+        scanf("%c", &user_input);
     }
-    if(save_game == 'y'){
+    if(user_input == 'y'){
         save_input(campo);
     }
     free(campo);
@@ -126,14 +161,29 @@ int generate_cicle(field * campo){
     int random;
     if(campo->nNumbers >= pow(campo->fieldSize, 2)) return 0;       // O campo está cheio
 
-    random = rand() % (int)(pow(campo->fieldSize, 2));  // size² is so  0 < (random / f_size) < f_size and 0 < (random % f_size) < f_size
+    /*
+    We can make a random position in a matrix by making a random
+    between 0 and size² and associating the integer division to
+    one index and the rest of the division to the other index.
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+    0, 0, 0, 0, 1, 1, 1, 1, 2, 2,  2,  2,  3,  3,  3,  3,  4
+    A concern is about the n², that extrapolates the index.
+    */
+    random = rand() % (int)(pow(campo->fieldSize, 2));
+    printf("ramdom : %d\n", random);
     do{
-        if(campo->matriz[(int)random / campo->fieldSize][random % campo->fieldSize] == -1){
-            campo->matriz[(int)random / campo->fieldSize][random % campo->fieldSize] = 2;
+        int i = (random / campo->fieldSize) % campo->fieldSize;
+        int j = random % campo->fieldSize;
+        if(campo->matriz[i][j] == -1){
+            campo->matriz[i][j] = 2;
             return 1;
         }
         random++;
     }while(1);
+}
+
+int is_board_full(field * campo){
+    return campo->nNumbers >= pow(campo->fieldSize, 2);       // O campo está cheio
 }
 
 // Recieves and treats the user input
@@ -166,6 +216,10 @@ int get_input(field * campo){
     }
     if(!strcmp("/LOAD", input)){
         load_input(campo);
+        return 1;
+    }
+    if(!strcmp("/QUIT", input)){
+        end_game_input(campo);
         return 1;
     }
     printf("Comando inválido! Tente novamente!\n");
@@ -308,15 +362,17 @@ void bottom_up(field * campo){
 
 // Calculates the game parameters according to current state of the field
 void calc_game_params(field * campo){
-    int newFieldSize = 0;
+    int nNumbers = 0;
     for(int i = 0; i < campo->fieldSize; i++)
         for(int j = 0; j < campo->fieldSize; j++){
             int currentCell = campo->matriz[i][j];
             if(currentCell != -1){
-                newFieldSize++;
+                nNumbers++;
                 if(currentCell > campo->highestNum) campo->highestNum = currentCell;
             }
+            
         }
+    campo->nNumbers = nNumbers;
 }
 
 // Prints the game parameters
@@ -328,7 +384,6 @@ void print_game_params(field * campo){
 // Prints the field in a grid formatted way
 void print_field(field * campo){
     char *** converted_matrix = convert_matrix_2048(campo->matriz, campo->fieldSize, campo->fieldSize);
-
     table_config print_configs;
     print_configs.data_type = "%s";
     print_configs.header = 0;

@@ -19,8 +19,7 @@ cd src
 The script will make the installation work for you (like downloading a tabling library from my github)
 
 # The commands
-
-
+## Move
 You have four moves:
 
 1. Left to right: ```right```, ``r``, ``A``, ``esquerda``
@@ -30,11 +29,22 @@ You have four moves:
 
 Note that the third input matches the ```W```, ```A```, ```S```, ```D``` input, but to avoid conflicts it’s upper case (just use the ```CapsLk``` and be happy)
 
+## Save and load
+You can save the game with command ```\SAVE``` \
+You can load a saved game with command ```\LOAD``` \
+
+## Quit game
+You can quit game with command ```\QUIT``` \
+
+
 # TODOs
 1. Add different field grid sizes - OK
 2. Add a more automatic control (without pressing "enter")
 3. Add a more natural print (without printing tons of grids in the screen) - OK
-4. Add a save option to continue the game even if the game was closed
+4. Add a save option to continue the game even if the game was closed - OK
+5. Add a save control, to save more informations about a saved game and avoid trying to \
+load a not existing save
+6. Fix a bug that ramdonly crashes the game - OK (i hope so)
 
 # Author
 
