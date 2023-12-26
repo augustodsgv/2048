@@ -31,10 +31,10 @@ Note that the third input matches the ```W```, ```A```, ```S```, ```D``` input, 
 
 ## Save and load
 You can save the game with command ```\SAVE``` \
-You can load a saved game with command ```\LOAD``` \
+You can load a saved game with command ```\LOAD``` 
 
 ## Quit game
-You can quit game with command ```\QUIT``` \
+You can quit game with command ```\QUIT```
 
 
 # TODOs
